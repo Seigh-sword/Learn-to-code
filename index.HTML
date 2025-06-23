@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Learn To Code🎨</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #1a1a2e;
+      font-family: 'Courier New', monospace;
+      color: #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    header {
+      padding: 20px;
+      background: linear-gradient(90deg, #00c9ff, #92fe9d);
+      width: 100%;
+      text-align: center;
+      color: black;
+      font-size: 28px;
+      font-weight: bold;
+      text-shadow: 1px 1px 2px white;
+    }
+
+    textarea {
+      width: 80%;
+      height: 120px;
+      margin-top: 20px;
+      padding: 10px;
+      background: #0f0f0f;
+      color: #00ff90;
+      font-size: 16px;
+      border: 2px solid #00ff90;
+      border-radius: 12px;
+      box-shadow: 0 0 8px #00ff90;
+      resize: none;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 12px 24px;
+      font-size: 16px;
+      background: #00ff90;
+      color: #000;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 0 10px #00ff90;
+      transition: 0.2s ease;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      background: #00ffaa;
+    }
+
+    #tutorial {
+      font-size: 18px;
+      margin: 20px;
+    }
+
+    #output {
+      background: #111;
+      color: #fff;
+      width: 80%;
+      min-height: 60px;
+      margin-top: 20px;
+      padding: 10px;
+      border-radius: 10px;
+      box-shadow: 0 0 8px #00ff90;
+    }
+
+    #xpBar {
+      width: 80%;
+      height: 25px;
+      background: #222;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: inset 0 0 10px #00ff90;
+      margin-top: 20px;
+    }
+
+    #xpFill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(to right, #00f260, #0575e6);
+      border-radius: 15px;
+      transition: width 1.5s ease-in-out;
+    }
+
+    #xpPoints {
+      margin-top: 8px;
+      font-size: 16px;
+    }
+
+    footer {
+      margin-top: 40px;
+      font-size: 12px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+
+  <header>🔥 Welcome to Learn to code</header>
+
+  <div id="tutorial">Level 1: Type a paragraph tag like: <code>&lt;p&gt;hi&lt;/p&gt;</code></div>
+
+  <textarea id="codeInput" placeholder="Type your HTML here..."></textarea>
+  <br>
+  <button onclick="runCode()">Check Code</button>
+
+  <div id="output"></div>
+
+  <div id="xpBar"><div id="xpFill"></div></div>
+  <div id="xpPoints">XP: 0 / 100</div>
+
+  <button id="continueBtn" style="display: none;" onclick="nextLevel()">✅ Continue</button>
+
+  <audio id="levelUpSound" src="exp.mp3" preload="auto"></audio>
+
+  <footer>👾 Built by ChatGPT & Arunkumar.S.J.✨</footer>
+
+  <script>
+const levels = [
+  {
+    text: "Level 1: Create a paragraph: <code>&lt;p&gt;hi&lt;/p&gt;</code>",
+    check: (out) => out.children[0]?.tagName === "P",
+    xp: 10
+  },
+  {
+    text: "Level 2: Add a heading: <code>&lt;h1&gt;Hello&lt;/h1&gt;</code>",
+    check: (out) => out.children[0]?.tagName?.startsWith("H"),
+    xp: 10
+  },
+  {
+    text: "Level 3: Bold text: <code>&lt;b&gt;Bold&lt;/b&gt;</code>",
+    check: (out) => out.innerHTML.includes("<b>"),
+    xp: 10
+  },
+  {
+    text: "Level 4: Italic text: <code>&lt;i&gt;Italic&lt;/i&gt;</code>",
+    check: (out) => out.innerHTML.includes("<i>"),
+    xp: 10
+  },
+  {
+    text: "Level 5: Underline text: <code>&lt;u&gt;Underlined&lt;/u&gt;</code>",
+    check: (out) => out.innerHTML.includes("<u>"),
+    xp: 10
+  },
+  {
+    text: "Level 6: Colored text: <code>&lt;p style='color:red;'&gt;Colorful&lt;/p&gt;</code>",
+    check: (out) => out.children[0]?.style?.color,
+    xp: 10
+  },
+  {
+    text: "Level 7: Add a link: <code>&lt;a href='https://example.com'&gt;Click&lt;/a&gt;</code>",
+    check: (out) => out.querySelector("a"),
+    xp: 10
+  },
+  {
+    text: "Level 8: Add an image: <code>&lt;img src='https://placekitten.com/200/200'&gt;</code>",
+    check: (out) => out.querySelector("img"),
+    xp: 10
+  },
+  {
+    text: "Level 9: Create a table: <code>&lt;table&gt;&lt;tr&gt;&lt;td&gt;1&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</code>",
+    check: (out) => out.querySelector("table"),
+    xp: 20
+  }
+];
+
+    let currentLevel = 0;
+    let xp = 0;
+
+    const tutorial = document.getElementById("tutorial");
+    const xpPoints = document.getElementById("xpPoints");
+    const xpFill = document.getElementById("xpFill");
+    const levelUpSound = document.getElementById("levelUpSound");
+    const continueBtn = document.getElementById("continueBtn");
+
+    tutorial.innerHTML = levels[currentLevel].text;
+
+    function runCode() {
+      const input = document.getElementById("codeInput").value.trim();
+      const output = document.getElementById("output");
+
+      try {
+        output.innerHTML = input;
+
+        if (levels[currentLevel].check(output)) {
+          continueBtn.style.display = "inline-block";
+        } else {
+          continueBtn.style.display = "none";
+          alert("❌ Incorrect! Try again with the correct tag.");
+        }
+      } catch {
+        alert("⚠️ Oops! Something went wrong with your code.");
+      }
+    }
+
+    function nextLevel() {
+      xp += levels[currentLevel].xp;
+      xpPoints.innerText = `XP: ${xp} / 100`;
+      xpFill.style.width = `${xp}%`;
+      levelUpSound.volume = 1.0;
+      levelUpSound.play();
+
+      currentLevel++;
+
+      if (currentLevel < levels.length) {
+        tutorial.innerHTML = levels[currentLevel].text;
+        continueBtn.style.display = "none";
+      } else {
+        tutorial.innerHTML = "🎉 CONGRATS! You finished the tutorial!";
+        continueBtn.style.display = "none";
+      }
+    }
+    // 🧙 Secret Dev Console Commands (Type these in browser console)
+
+// Skip to the final level and auto-finish
+function finish() {
+  currentLevel = levels.length - 1;
+  xp = 100;
+  xpPoints.innerText = `XP: ${xp} / 100`;
+  xpFill.style.width = `${xp}%`;
+  tutorial.innerHTML = "🎉 CONGRATS! You finished the tutorial!";
+  continueBtn.style.display = "none";
+  levelUpSound.play();
+  console.log("✨ Finished the course using finish()!");
+}
+
+// Restart the tutorial from the beginning
+function restart() {
+  currentLevel = 0;
+  xp = 0;
+  xpPoints.innerText = `XP: 0 / 100`;
+  xpFill.style.width = `0%`;
+  tutorial.innerHTML = levels[currentLevel].text;
+  continueBtn.style.display = "none";
+  document.getElementById("codeInput").value = "";
+  document.getElementById("output").innerHTML = "";
+  console.log("🔄 Restarted the tutorial using restart()");
+}
+
+// Jump to a specific level
+function skip(levelNum) {
+  if (levelNum >= 0 && levelNum < levels.length) {
+    currentLevel = levelNum;
+    tutorial.innerHTML = levels[currentLevel].text;
+    continueBtn.style.display = "none";
+    document.getElementById("codeInput").value = "";
+    document.getElementById("output").innerHTML = "";
+    console.log(`⏭️ Skipped to level ${levelNum + 1}`);
+  } else {
+    console.warn("❌ Invalid level number!");
+  }
+}
+
+// Manually set XP
+function setXP(amount) {
+  xp = amount;
+  xpPoints.innerText = `XP: ${xp} / 100`;
+  xpFill.style.width = `${xp}%`;
+  console.log(`💎 XP set to ${amount}`);
+}
+
+// Auto complete current level's code
+function autoComplete() {
+  const textarea = document.getElementById("codeInput");
+  switch (currentLevel) {
+    case 0:
+      textarea.value = "<p>hi</p>"; break;
+    case 1:
+      textarea.value = "<h1>Hello</h1>"; break;
+    case 2:
+      textarea.value = "<b>Bold</b>"; break;
+    case 3:
+      textarea.value = "<i>Italic</i>"; break;
+    case 4:
+      textarea.value = "<u>Underlined</u>"; break;
+    case 5:
+      textarea.value = "<p style='color:red;'>Colorful</p>"; break;
+    case 6:
+      textarea.value = "<a href='https://example.com'>Click</a>"; break;
+    case 7:
+      textarea.value = "<img src='https://placekitten.com/200/200'>"; break;
+    case 8:
+      textarea.value = "<table><tr><td>1</td></tr></table>"; break;
+    default:
+      console.warn("🚫 No code to autocomplete for this level.");
+  }
+  console.log("🧪 Code auto-filled for current level.");
+}
+
+  </script>
+</body>
+</html>
